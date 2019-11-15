@@ -48,7 +48,7 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 
 		var targetURL *url.URL
 		var err error
-		if targetURL, err = o.GetURL(version); err == nil {
+		if targetURL, err = o.GetAndCacheURL(version); err == nil {
 			w.Header().Set("Location", fmt.Sprintf("https://jenkins-zh.gitee.io/update-center-mirror/tsinghua/%s",
 				targetURL.RequestURI()))
 			w.WriteHeader(301)
@@ -92,8 +92,25 @@ func (o *ServerOptions) GetURL(version string) (targetURL *url.URL, err error) {
 
 // GetAndCacheURL get the real URL, then cache it
 func (o *ServerOptions) GetAndCacheURL(version string) (targetURL *url.URL, err error) {
-	// TODO check whether the cache is exists
-	targetURL, err = o.GetURL(version)
+	var cacheErr error
+	cacheServer := FileSystemCacheServer{FileName:"cache.yaml"}
+	if cacheURL := cacheServer.Load(version); cacheURL != "" {
+		targetURL, cacheErr = url.Parse(cacheURL)
+	} else {
+		if targetURL, err = o.GetURL(version); err == nil {
+			if cacheErr = cacheServer.Save(version, targetURL.String()); cacheErr != nil {
+				log.Println(cacheErr)
+			}
+		}
+	}
+
+	if cacheErr != nil {
+		if targetURL, err = o.GetURL(version); err == nil {
+			if cacheErr = cacheServer.Save(version, targetURL.String()); cacheErr != nil {
+				log.Println(cacheErr)
+			}
+		}
+	}
 	return
 }
 
