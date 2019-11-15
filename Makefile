@@ -16,7 +16,7 @@ linux: ## Build for linux
 	chmod +x bin/linux/$(NAME)
 
 run:
-	./bin/darwin/$(NAME)
+	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
 
 cert:
 	mkdir -p bin/rootCA

@@ -1,16 +1,13 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	cmd "github.com/jenkins-zh/mirror-proxy/pkg"
 )
 
-func main()  {
-	http.HandleFunc("/update-center.json", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Location", "https://jenkins-zh.gitee.io/update-center-mirror/tsinghua/update-center.json")
-		w.WriteHeader(301)
-	})
-
-	err := http.ListenAndServeTLS(":7899", "demo.crt", "demo.key", nil)
-	log.Fatal(err)
+func main() {
+	//opt := &cmd.ServerOptions{}
+	//opt.GetURL("")
+	//opt.GetURL("2.204")
+	//opt.GetURL("2.190.2")
+	cmd.Execute()
 }
