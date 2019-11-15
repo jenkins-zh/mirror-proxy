@@ -49,7 +49,7 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 		var targetURL *url.URL
 		var err error
 		if targetURL, err = o.GetAndCacheURL(version); err == nil {
-			w.Header().Set("Location", fmt.Sprintf("https://jenkins-zh.gitee.io/update-center-mirror/tsinghua/%s",
+			w.Header().Set("Location", fmt.Sprintf("https://jenkins-zh.gitee.io/update-center-mirror/tsinghua%s",
 				targetURL.RequestURI()))
 			w.WriteHeader(301)
 		} else {
