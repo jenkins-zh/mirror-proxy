@@ -13,6 +13,7 @@ import (
 type ServerOptions struct {
 	Host string
 	Port int
+	PortLTS int
 
 	CertFile string
 	KeyFile string
@@ -34,6 +35,8 @@ func init()  {
 		"The host of the server")
 	rootCmd.Flags().IntVarP(&serverOptions.Port, "port", "", 7070,
 		"The port of the server")
+	rootCmd.Flags().IntVarP(&serverOptions.Port, "port-lts", "", 7071,
+		"The LTS port of the server")
 
 	rootCmd.Flags().StringVarP(&serverOptions.CertFile, "cert", "", "",
 		"The cert file of the server")
@@ -61,7 +64,13 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 		}
 	})
 
-	err = http.ListenAndServeTLS(fmt.Sprintf("%s:%d", o.Host, o.Port),
+	go func() {
+		err := http.ListenAndServe(fmt.Sprintf("%s:%d", o.Host, o.Port), nil)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+	err = http.ListenAndServeTLS(fmt.Sprintf("%s:%d", o.Host, o.PortLTS),
 		o.CertFile, o.KeyFile, nil)
 	return
 }
