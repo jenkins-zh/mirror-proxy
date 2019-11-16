@@ -1,9 +1,23 @@
-# mirror-proxy
-Jenkins Update Center mirror proxy
+## Jenkins Update Center Mirror Proxy
 
-```bash
-openssl genrsa -out demo.key 1024
-openssl req -new -x509 -days 1095 -key demo.key \
-    -out demo.crt \
-    -subj "/C=CN/ST=GD/L=SZ/O=vihoo/OU=dev/CN=demo.com/emailAddress=demo@demo.com"
-```
+The proxy is a HTTP server which serve for several different Jenkins Update Center sites.
+
+## Get started
+
+Run it as demo on MacOS, please follow this:
+
+`make darwin cert run`
+
+On Linux, please follow this:
+
+`make linux cert run-linux`
+
+Run it as a Docker container:
+
+`docker run -v rootCA:/rootCA docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:0.0.1 --cert /rootCA/demo.crt --key /rootCA/demo.key`
+
+## API
+
+The only API path is:
+
+`/update-center.json?version=`
