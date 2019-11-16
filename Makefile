@@ -18,6 +18,9 @@ linux: ## Build for linux
 run:
 	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
 
+run-linux:
+	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
+
 cert:
 	mkdir -p bin/rootCA
 	openssl genrsa -out bin/rootCA/demo.key 1024

@@ -1,0 +1,25 @@
+name: Build & Push
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+      - name: Build
+        run: make linux
+      - name: Docker Publish
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER }}
+        run: |
+          docker login docker.pkg.github.com --username LinuxSuRen --password ${DOCKER_TOKEN}
+          docker build . -t docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:0.0.1
+          docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:0.0.1
