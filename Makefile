@@ -25,3 +25,6 @@ cert:
 	mkdir -p bin/rootCA
 	openssl genrsa -out bin/rootCA/demo.key 1024
 	openssl req -new -x509 -days 1095 -key bin/rootCA/demo.key -out bin/rootCA/demo.crt -subj "/C=CN/ST=GD/L=SZ/O=vihoo/OU=dev/CN=demo.com/emailAddress=demo@demo.com"
+
+fmt:
+	go fmt ./pkg/...
