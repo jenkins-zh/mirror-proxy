@@ -26,4 +26,22 @@ Run it as a Docker container:
 
 The only API path is:
 
-`/update-center.json?version=`
+|API|Description|
+|---|---|
+|`GET /update-center.json?version=2.190.2`|Get the update-center.json which allows you give different query conditions|
+|`GET /json-servers`|Get all JSON servers|
+|`GET /providers`|Get all mirror storage providers|
+|`GET /providers/default`|Get the default mirror storage provider|
+
+### Update Center
+
+Below are the query ways for the update center of the mirror:
+
+|Key|Description|
+|---|---|
+|`version`|The version of current Jenkins|
+|`mirror-experimental`|Indicate if you want to use the experimental of plugins|
+|`mirror-jsonServer`|Specific the JSON server|
+|`mirror-provider`|Specific the mirror storage provider|
+
+**All keys come from query and header. Header value will override the query ones.**

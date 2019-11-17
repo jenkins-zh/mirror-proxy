@@ -1,126 +1,21 @@
 package pkg
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mitchellh/go-homedir"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"log"
+	"github.com/jenkins-zh/mirror-proxy/pkg/helper"
+	"io"
 	"net/http"
 	"net/url"
-	"os"
 )
 
-// ServerOptions represents the options for a server
-type ServerOptions struct {
-	Config string
-
-	DefaultProvider string
-	DefaultJSONServer string
-
-	Host string
-	Port int
-	PortLTS int
-
-	CertFile string
-	KeyFile string
-}
-
-var serverOptions ServerOptions
-
-var rootCmd = &cobra.Command{
-	Use:   "mirror-proxy",
-	Short: "mirror-proxy is the proxy of Jenkins Update Center",
-	Run: func(cmd *cobra.Command, args []string) {
-		err := serverOptions.Run(cmd, args)
-		log.Fatal(err)
-	},
-}
-
-func init()  {
-	cobra.OnInitialize(initConfig)
-
-	rootCmd.Flags().StringVar(&serverOptions.Config, "config", "", "config file (default is $HOME/.mirror-proxy.yaml)")
-	rootCmd.Flags().StringVarP(&serverOptions.DefaultProvider, "default-provider", "", "tsinghua",
-		"The default provider of the update center mirror")
-	rootCmd.Flags().StringVarP(&serverOptions.DefaultJSONServer, "default-json-server", "", "https://jenkins-zh.gitee.io/update-center-mirror",
-		"The default JSON server of the update center mirror")
-
-	rootCmd.Flags().StringVarP(&serverOptions.Host, "host", "", "127.0.0.1",
-		"The host of the server")
-	rootCmd.Flags().IntVarP(&serverOptions.Port, "port", "", 7070,
-		"The port of the server")
-	rootCmd.Flags().IntVarP(&serverOptions.Port, "port-lts", "", 7071,
-		"The LTS port of the server")
-
-	rootCmd.Flags().StringVarP(&serverOptions.CertFile, "cert", "", "",
-		"The cert file of the server")
-	rootCmd.Flags().StringVarP(&serverOptions.KeyFile, "key", "", "",
-		"The key file of the server")
-
-	viper.BindPFlag("default-provider", rootCmd.PersistentFlags().Lookup("default-provider"))
-	viper.BindPFlag("default-json-server", rootCmd.PersistentFlags().Lookup("default-json-server"))
-	viper.BindPFlag("cert", rootCmd.PersistentFlags().Lookup("cert"))
-	viper.BindPFlag("key", rootCmd.PersistentFlags().Lookup("key"))
-}
-
-func initConfig() {
-	if serverOptions.Config != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(serverOptions.Config)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Search config in home directory with name ".mirror-proxy" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".mirror-proxy")
-	}
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
-}
-
-// GetProviders get all providers
-func GetProviders() (providers []string) {
-	providers = viper.GetStringSlice("providers")
-	return
-}
-
-// GetJSONServers get all JSON servers
-func GetJSONServers() map[string]string {
-	return viper.GetStringMapString("jsonServers")
-}
-
-// GetProviderURL get the update center URL from a provider
-func (o *ServerOptions) GetProviderURL(official *url.URL, query UpdateCenterQuery) (targetURL string) {
-	jsonServer, provider := query.JsonServer, query.Provider
-	if provider == "" {
-		provider = o.DefaultProvider
-	}
-
-	jsonServer, ok := GetJSONServers()[jsonServer]
-	if !ok {
-		jsonServer = o.DefaultJSONServer
-	}
-
-	targetURL = fmt.Sprintf("%s/%s%s", jsonServer, provider, official.RequestURI())
-	return
-}
-
-// UpdateCenterQuery holds the info for query a update center
-type UpdateCenterQuery struct {
-	Version string
-	Provider string
-	JsonServer string
-	Experimental bool
+// AddContext add context inject all handlers
+func AddContext(next http.Handler, option *ServerOptions) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), context.TODO(), *option)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 // GetUpdateCenterQuery returns the query object
@@ -130,159 +25,97 @@ func GetUpdateCenterQuery(querySources ...QuerySource) (query UpdateCenterQuery)
 			query.Version = version
 		}
 
-		if provider := querySource.Get("provider"); provider != "" {
+		if provider := querySource.Get("mirror-provider"); provider != "" {
 			query.Provider = provider
 		}
 
-		if jsonServer := querySource.Get("jsonServer"); jsonServer != "" {
-			query.JsonServer = jsonServer
+		if jsonServer := querySource.Get("mirror-jsonServer"); jsonServer != "" {
+			query.JSONServer = jsonServer
 		}
 
-		if experimental := querySource.Get("experimental"); experimental == "true" {
+		if experimental := querySource.Get("mirror-experimental"); experimental == "true" {
 			query.Experimental = true
 		}
 	}
 	return
 }
 
-// QuerySource which contains the methods to query
-type QuerySource interface {
-	Get(key string) string
+// HandleUpdateCenter handle GET /update-center.json
+func HandleUpdateCenter(w http.ResponseWriter, r *http.Request) {
+	o := r.Context().Value(context.TODO()).(ServerOptions)
+	query := GetUpdateCenterQuery(r.URL.Query(), r.Header)
+
+	var targetURL *url.URL
+	var err error
+	if targetURL, err = o.GetAndCacheURL(query); err == nil {
+		w.Header().Set("Location", o.GetProviderURL(targetURL, query))
+		w.WriteHeader(http.StatusMovedPermanently)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+
+		_, err = w.Write([]byte(fmt.Sprintf("%v", err)))
+	}
+	helper.CheckErr(err)
 }
 
-// Run startup a server
-func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
-	http.HandleFunc("/update-center.json", func(w http.ResponseWriter, r *http.Request) {
-		query := GetUpdateCenterQuery(r.URL.Query(), r.Header)
-
-		var targetURL *url.URL
-		var err error
-		if targetURL, err = o.GetAndCacheURL(query); err == nil {
-			w.Header().Set("Location", o.GetProviderURL(targetURL, query))
-			w.WriteHeader(301)
-		} else {
-			w.WriteHeader(400)
-
-			if _, err = w.Write([]byte(fmt.Sprintf("%v", err))); err != nil {
-				log.Println(err)
-			}
-		}
-	})
-
-	http.HandleFunc("/json-servers", func(w http.ResponseWriter, r *http.Request) {
-		data, err := json.Marshal(GetJSONServers())
-		if err == nil {
-			_, err = w.Write(data)
-		}
-
-		if err != nil {
-			log.Println(err)
-		}
-	})
-
-	http.HandleFunc("/providers", func(w http.ResponseWriter, r *http.Request) {
-		providers := GetProviders()
-		includeDefaultProvider := false
-		for _, provider := range providers {
-			if provider == o.DefaultProvider {
-				includeDefaultProvider = true
+// HandleJSONServers handle /json-servers
+func HandleJSONServers(w http.ResponseWriter, r *http.Request) {
+	o := r.Context().Value(context.TODO()).(ServerOptions)
+	servers := GetJSONServers()
+	if _, ok := servers["default"]; ok {
+		servers["default"] = o.DefaultJSONServer
+	} else {
+		match := false
+		for _, val := range servers {
+			if val == o.DefaultJSONServer {
+				match = true
 				break
 			}
 		}
 
-		if !includeDefaultProvider {
-			providers = append(providers, o.DefaultProvider)
+		if !match {
+			servers["default"] = o.DefaultJSONServer
 		}
+	}
 
-		var writeErr error
-		if data, err := json.Marshal(providers); err == nil {
-			_, writeErr = w.Write(data)
-		} else {
-			w.WriteHeader(500)
-			_, writeErr = w.Write([]byte(fmt.Sprintf("%v", err)))
-		}
-
-		if writeErr != nil {
-			log.Println(writeErr)
-		}
-	})
-
-	http.HandleFunc("/providers/default", func(w http.ResponseWriter, r *http.Request) {
-		var writeErr error
-		_, writeErr = w.Write([]byte(o.DefaultProvider))
-		if writeErr != nil {
-			log.Println(writeErr)
-		}
-	})
-
-	go func() {
-		err := http.ListenAndServe(fmt.Sprintf("%s:%d", o.Host, o.Port), nil)
-		if err != nil {
-			log.Println(err)
-		}
-	}()
-	err = http.ListenAndServeTLS(fmt.Sprintf("%s:%d", o.Host, o.PortLTS),
-		o.CertFile, o.KeyFile, nil)
-	return
-}
-
-// GetURL get the real URL from the official site
-func (o *ServerOptions) GetURL(version string) (targetURL *url.URL, err error) {
-	var (
-		request *http.Request
-		response *http.Response
-	)
-
-	api := fmt.Sprintf("https://updates.jenkins.io/update-center.json?version=%s", version)
-	request, err = http.NewRequest("GET", api, nil)
+	data, err := json.Marshal(GetJSONServers())
 	if err == nil {
-		client := &http.Client{
-			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
-		}
-
-		response, err = client.Do(request)
-		if err == nil {
-			targetURL, err = response.Location()
-		}
+		_, err = w.Write(data)
 	}
-	return
+	helper.CheckErr(err)
 }
 
-// GetAndCacheURL get the real URL, then cache it
-func (o *ServerOptions) GetAndCacheURL(query UpdateCenterQuery) (targetURL *url.URL, err error) {
-	var cacheErr error
+// HandleProviders handle /providers
+func HandleProviders(w http.ResponseWriter, r *http.Request) {
+	o := r.Context().Value(context.TODO()).(ServerOptions)
 
-	if query.Experimental {
-		return url.Parse("https://updates.jenkins.io/experimental/update-center.json")
+	providers := GetProviders()
+	includeDefaultProvider := false
+	for _, provider := range providers {
+		if provider == o.DefaultProvider {
+			includeDefaultProvider = true
+			break
+		}
 	}
 
-	version := query.Version
-	cacheServer := FileSystemCacheServer{FileName:"cache.yaml"}
-	if cacheURL := cacheServer.Load(version); cacheURL != "" {
-		targetURL, cacheErr = url.Parse(cacheURL)
+	if !includeDefaultProvider {
+		providers = append(providers, o.DefaultProvider)
+	}
+
+	var writeErr error
+	if data, err := json.Marshal(providers); err == nil {
+		_, writeErr = w.Write(data)
 	} else {
-		if targetURL, err = o.GetURL(version); err == nil {
-			if cacheErr = cacheServer.Save(version, targetURL.String()); cacheErr != nil {
-				log.Println(cacheErr)
-			}
-		}
+		w.WriteHeader(500)
+		_, writeErr = io.WriteString(w, fmt.Sprintf("%v", err))
 	}
-
-	if cacheErr != nil {
-		if targetURL, err = o.GetURL(version); err == nil {
-			if cacheErr = cacheServer.Save(version, targetURL.String()); cacheErr != nil {
-				log.Println(cacheErr)
-			}
-		}
-	}
-	return
+	helper.CheckErr(writeErr)
 }
 
-// Execute will execute the command
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+// HandleDefaultProvider handle /providers/default
+func HandleDefaultProvider(w http.ResponseWriter, r *http.Request) {
+	var writeErr error
+	o := r.Context().Value(context.TODO()).(ServerOptions)
+	_, writeErr = io.WriteString(w, o.DefaultProvider)
+	helper.CheckErr(writeErr)
 }

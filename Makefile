@@ -7,11 +7,13 @@ VERSION := dev-$(shell git describe --tags $(shell git rev-list --tags --max-cou
 BUILDFLAGS =
 COVERED_MAIN_SRC_FILE=./main
 
-darwin: ## Build for OSX
+all: fmt verify
+
+darwin: all
 	GO111MODULE=on CGO_ENABLED=$(CGO_ENABLED) GOOS=darwin GOARCH=amd64 $(GO) $(BUILD_TARGET) $(BUILDFLAGS) -o bin/darwin/$(NAME) $(MAIN_SRC_FILE)
 	chmod +x bin/darwin/$(NAME)
 
-linux: ## Build for linux
+linux: all
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=linux GOARCH=amd64 $(GO) $(BUILD_TARGET) $(BUILDFLAGS) -o bin/linux/$(NAME) $(MAIN_SRC_FILE)
 	chmod +x bin/linux/$(NAME)
 
@@ -28,3 +30,7 @@ cert:
 
 fmt:
 	go fmt ./pkg/...
+
+verify:
+	go vet ./pkg/...
+	golint -set_exit_status ./pkg/...

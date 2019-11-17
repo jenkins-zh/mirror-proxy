@@ -8,7 +8,7 @@ import (
 // CacheServer is the interface for saving a cache item
 type CacheServer interface {
 	Load(string) string
-	Save(string, string)
+	Save(string, string) error
 }
 
 // FileSystemCacheServer save the cache into a filesystem
@@ -28,6 +28,9 @@ func (c *FileSystemCacheServer) Load(key string) (val string) {
 
 // Save save the key into a file
 func (c *FileSystemCacheServer) Save(key string, val string) (err error) {
+	if c.cache == nil {
+		c.cache = make(map[string]string, 1)
+	}
 	c.cache[key] = val
 	var data []byte
 
@@ -46,4 +49,3 @@ func (c *FileSystemCacheServer) parse() (err error) {
 	}
 	return nil
 }
-
