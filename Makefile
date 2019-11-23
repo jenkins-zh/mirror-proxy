@@ -36,7 +36,7 @@ verify: tools
 	go get -u golang.org/x/lint/golint
 	golint -set_exit_status ./pkg/...
 
-before-test: fmt verify
+before-test: fmt
 
 tools:
 	go get -u golang.org/x/lint/golint
