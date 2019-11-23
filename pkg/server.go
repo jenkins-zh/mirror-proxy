@@ -55,7 +55,7 @@ func HandleUpdateCenter(w http.ResponseWriter, r *http.Request) {
 
 		_, err = w.Write([]byte(fmt.Sprintf("%v", err)))
 	}
-	helper.CheckErr(err)
+	helper.CheckErr(o.Printer, err)
 }
 
 // HandleJSONServers handle /json-servers
@@ -82,7 +82,7 @@ func HandleJSONServers(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		_, err = w.Write(data)
 	}
-	helper.CheckErr(err)
+	helper.CheckErr(o.Printer, err)
 }
 
 // HandleProviders handle /providers
@@ -109,7 +109,7 @@ func HandleProviders(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		_, writeErr = io.WriteString(w, fmt.Sprintf("%v", err))
 	}
-	helper.CheckErr(writeErr)
+	helper.CheckErr(o.Printer, writeErr)
 }
 
 // HandleDefaultProvider handle /providers/default
@@ -117,5 +117,5 @@ func HandleDefaultProvider(w http.ResponseWriter, r *http.Request) {
 	var writeErr error
 	o := r.Context().Value(context.TODO()).(ServerOptions)
 	_, writeErr = io.WriteString(w, o.DefaultProvider)
-	helper.CheckErr(writeErr)
+	helper.CheckErr(o.Printer, writeErr)
 }

@@ -25,21 +25,30 @@ type ServerOptions struct {
 
 	CertFile string
 	KeyFile  string
+
+	Printer helper.Printer
 }
 
 var serverOptions ServerOptions
 
-var rootCmd = &cobra.Command{
+var rootCmd = &cobra.Command {
 	Use:   "mirror-proxy",
 	Short: "mirror-proxy is the proxy of Jenkins Update Center",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := serverOptions.Run(cmd, args)
-		helper.CheckErr(err)
+		helper.CheckErr(cmd, err)
 	},
 }
 
+// GetRootCmd returns the root command
+func GetRootCmd() *cobra.Command {
+	return rootCmd
+}
+
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(func() {
+		initConfig(rootCmd)
+	})
 
 	rootCmd.Flags().StringVar(&serverOptions.Config, "config", "", "config file (default is $HOME/.mirror-proxy.yaml)")
 	rootCmd.Flags().StringVarP(&serverOptions.DefaultProvider, "default-provider", "", "tsinghua",
@@ -65,7 +74,7 @@ func init() {
 	viper.BindPFlag("key", rootCmd.PersistentFlags().Lookup("key"))
 }
 
-func initConfig() {
+func initConfig(printer helper.Printer) {
 	if serverOptions.Config != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(serverOptions.Config)
@@ -84,7 +93,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		printer.Println("Using config file:", viper.ConfigFileUsed())
 	}
 }
 
@@ -125,14 +134,21 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 	mux.Handle("/json-servers", AddContext(http.HandlerFunc(HandleJSONServers), o))
 	mux.Handle("/providers", AddContext(http.HandlerFunc(HandleProviders), o))
 	mux.Handle("/providers/default", AddContext(http.HandlerFunc(HandleDefaultProvider), o))
+
+	ltsServer := http.Server{
+		Handler: mux,
+		Addr:    fmt.Sprintf("%s:%d", o.Host, o.PortLTS),
+	}
+	server := http.Server{
+		Handler: mux,
+		Addr:    fmt.Sprintf("%s:%d", o.Host, o.Port),
+	}
+
 	go func() {
-		err := http.ListenAndServe(fmt.Sprintf("%s:%d", o.Host, o.Port), mux)
-		if err != nil {
-			log.Println(err)
-		}
+		err := server.ListenAndServe()
+		helper.CheckErr(cmd, err)
 	}()
-	err = http.ListenAndServeTLS(fmt.Sprintf("%s:%d", o.Host, o.PortLTS),
-		o.CertFile, o.KeyFile, nil)
+	err = ltsServer.ListenAndServeTLS(o.CertFile, o.KeyFile)
 	return
 }
 
