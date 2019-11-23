@@ -10,7 +10,7 @@ func CheckErr(printer Printer, err error) {
 	}
 }
 
-// Printer
+// Printer for the output
 type Printer interface {
 	Println(a ...interface{})
 }

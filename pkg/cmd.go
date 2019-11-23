@@ -31,7 +31,7 @@ type ServerOptions struct {
 
 var serverOptions ServerOptions
 
-var rootCmd = &cobra.Command {
+var rootCmd = &cobra.Command{
 	Use:   "mirror-proxy",
 	Short: "mirror-proxy is the proxy of Jenkins Update Center",
 	Run: func(cmd *cobra.Command, args []string) {

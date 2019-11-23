@@ -25,10 +25,10 @@ var _ = Describe("server cmd test", func() {
 
 var _ = Describe("GetAndCacheURL", func() {
 	var (
-		opt *server.ServerOptions
-		query server.UpdateCenterQuery
+		opt       *server.ServerOptions
+		query     server.UpdateCenterQuery
 		cachedURL *url.URL
-		err error
+		err       error
 	)
 
 	BeforeEach(func() {
