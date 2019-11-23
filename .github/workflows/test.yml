@@ -16,6 +16,7 @@ jobs:
         id: go
       - name: Build
         run: |
+          echo "Tag"
           VERSION=$(git tag --list | sort -V | tail -n 1)
           VERSION_BITS=(${VERSION//./ })
           VNUM1=${VERSION_BITS[0]}
