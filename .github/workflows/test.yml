@@ -1,0 +1,27 @@
+name: Build & Push
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+      - name: Build
+        run: |
+          VERSION=$(hub tag --list | sort -V | tail -n 1)
+          VERSION_BITS=(${VERSION//./ })
+          VNUM1=${VERSION_BITS[0]}
+          VNUM2=${VERSION_BITS[1]}
+          VNUM3=${VERSION_BITS[2]}
+          VNUM3=$((VNUM3+1))
+
+          NEW_TAG="$VNUM1.$VNUM2.$VNUM3"
+          echo "Updating $VERSION to $NEW_TAG"

@@ -19,6 +19,9 @@ linux: common
 
 build-all: darwin linux
 
+tools:
+	go get -u golang.org/x/lint/golint
+
 run:
 	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
 
@@ -37,6 +40,6 @@ verify:
 	go vet ./pkg/...
 	golint -set_exit_status ./pkg/...
 
-test: common
+test: tools common
 	go vet ./...
 	go test ./... -v -coverprofile coverage.out
