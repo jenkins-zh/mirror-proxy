@@ -23,6 +23,15 @@ jobs:
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER }}
         run: |
+          VERSION=$(git tag --list | sort -V | tail -n 1)
+          VERSION_BITS=(${VERSION//./ })
+          VNUM1=${VERSION_BITS[0]}
+          VNUM2=${VERSION_BITS[1]}
+          VNUM3=${VERSION_BITS[2]}
+          VNUM3=$((VNUM3+1))
+
+          NEW_TAG="$VNUM1.$VNUM2.$VNUM3"
+
           docker login docker.pkg.github.com --username LinuxSuRen --password ${DOCKER_TOKEN}
-          docker build . -t docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:0.0.1
-          docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:0.0.1
+          docker build . -t docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG
+          docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG
