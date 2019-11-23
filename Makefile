@@ -7,13 +7,11 @@ VERSION := dev-$(shell git describe --tags $(shell git rev-list --tags --max-cou
 BUILDFLAGS =
 COVERED_MAIN_SRC_FILE=./main
 
-common: fmt verify
-
-darwin: common
+darwin:
 	GO111MODULE=on CGO_ENABLED=$(CGO_ENABLED) GOOS=darwin GOARCH=amd64 $(GO) $(BUILD_TARGET) $(BUILDFLAGS) -o bin/darwin/$(NAME) $(MAIN_SRC_FILE)
 	chmod +x bin/darwin/$(NAME)
 
-linux: common
+linux:
 	CGO_ENABLED=$(CGO_ENABLED) GOOS=linux GOARCH=amd64 $(GO) $(BUILD_TARGET) $(BUILDFLAGS) -o bin/linux/$(NAME) $(MAIN_SRC_FILE)
 	chmod +x bin/linux/$(NAME)
 
@@ -40,6 +38,8 @@ verify:
 	go vet ./pkg/...
 	golint -set_exit_status ./pkg/...
 
-test: tools common
+before-test: fmt verify
+
+test: tools before-test
 	go vet ./...
 	go test ./... -v -coverprofile coverage.out
