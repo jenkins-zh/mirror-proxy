@@ -1,0 +1,5 @@
+providers:
+  tsinghua
+jsonServers:
+  Gitee: https://jenkins-zh.gitee.io/update-center-mirror
+  GitHub: https://jenkins-zh.github.io/update-center-mirror
