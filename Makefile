@@ -33,6 +33,7 @@ fmt:
 
 verify: tools
 	go vet ./pkg/...
+	go get -u golang.org/x/lint/golint
 	golint -set_exit_status ./pkg/...
 
 before-test: fmt verify
