@@ -35,3 +35,12 @@ jobs:
           docker login docker.pkg.github.com --username LinuxSuRen --password ${DOCKER_TOKEN}
           docker build . -t docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG
           docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG
+      - name: git-tag
+        uses: jenkins-zh/git-tag-actions@master
+        env:
+          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
+      - name: backup
+        uses: jenkins-zh/git-backup-actions@v0.0.1
+        env:
+          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
+          TARGET_GIT: "git@gitee.com:jenkins-zh/mirror-proxy.git"
