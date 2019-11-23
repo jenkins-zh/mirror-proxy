@@ -17,9 +17,6 @@ linux:
 
 build-all: darwin linux
 
-tools:
-	go get -u golang.org/x/lint/golint
-
 run:
 	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
 
@@ -34,11 +31,14 @@ cert:
 fmt:
 	go fmt ./pkg/...
 
-verify:
+verify: tools
 	go vet ./pkg/...
 	golint -set_exit_status ./pkg/...
 
 before-test: fmt verify
+
+tools:
+	go get -u golang.org/x/lint/golint
 
 test: tools before-test
 	go vet ./...
