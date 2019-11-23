@@ -13,15 +13,15 @@ import (
 var _ = Describe("test server", func() {
 	var (
 		option server.ServerOptions
-		api string
+		api    string
 
 		request *http.Request
-		reqErr error
+		reqErr  error
 
 		recorder *httptest.ResponseRecorder
 
 		bodyData []byte
-		bodyErr error
+		bodyErr  error
 
 		reqHandler http.HandlerFunc
 	)
@@ -132,7 +132,7 @@ var _ = Describe("test server", func() {
 
 var _ = Describe("GetUpdateCenterQuery", func() {
 	var (
-		query server.UpdateCenterQuery
+		query        server.UpdateCenterQuery
 		querySources []server.QuerySource
 	)
 
@@ -149,7 +149,7 @@ var _ = Describe("GetUpdateCenterQuery", func() {
 
 	Context("give one query", func() {
 		BeforeEach(func() {
-			querySources = []server.QuerySource {
+			querySources = []server.QuerySource{
 				&FakeQuery{Key: "version", Value: "fake"},
 				&FakeQuery{Key: "mirror-provider", Value: "fake"},
 				&FakeQuery{Key: "mirror-jsonServer", Value: "fake"},
@@ -168,7 +168,7 @@ var _ = Describe("GetUpdateCenterQuery", func() {
 
 // FakeQuery only for test
 type FakeQuery struct {
-	Key string
+	Key   string
 	Value string
 }
 
