@@ -16,7 +16,7 @@ jobs:
         id: go
       - name: Build
         run: |
-          VERSION=$(hub tag --list | sort -V | tail -n 1)
+          VERSION=$(git tag --list | sort -V | tail -n 1)
           VERSION_BITS=(${VERSION//./ })
           VNUM1=${VERSION_BITS[0]}
           VNUM2=${VERSION_BITS[1]}
