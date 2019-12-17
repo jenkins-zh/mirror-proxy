@@ -16,7 +16,7 @@ USER root
 RUN sed -i 's|dl-cdn.alpinelinux.org|mirrors.aliyun.com|g' /etc/apk/repositories
 RUN apk add --no-cache ca-certificates curl
 
-COPY --from=builder /app/bin/linux/mirror-proxy .
+COPY --from=builder bin/linux/mirror-proxy .
 RUN chmod u+x mirror-proxy
 
 COPY config/.mirror-proxy.yaml /root/.mirror-proxy.yaml
