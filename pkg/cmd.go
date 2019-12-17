@@ -151,10 +151,7 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 		Addr:    fmt.Sprintf("%s:%d", o.Host, o.Port),
 	}
 
-	go func() {
-		err := server.ListenAndServe()
-		helper.CheckErr(cmd, err)
-	}()
+	err = server.ListenAndServe()
 	return
 }
 
