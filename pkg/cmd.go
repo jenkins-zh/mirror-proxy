@@ -22,6 +22,7 @@ type ServerOptions struct {
 	Host    string
 	Port    int
 	PortLTS int
+	EnableLTS bool
 
 	CertFile string
 	KeyFile  string
@@ -62,6 +63,8 @@ func init() {
 		"The port of the server")
 	rootCmd.Flags().IntVarP(&serverOptions.Port, "port-lts", "", 7071,
 		"The LTS port of the server")
+	rootCmd.Flags().BoolVarP(&serverOptions.EnableLTS, "enable-lts", "", false,
+		"If enable the lts")
 
 	rootCmd.Flags().StringVarP(&serverOptions.CertFile, "cert", "", "",
 		"The cert file of the server")
@@ -135,10 +138,14 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 	mux.Handle("/providers", AddContext(http.HandlerFunc(HandleProviders), o))
 	mux.Handle("/providers/default", AddContext(http.HandlerFunc(HandleDefaultProvider), o))
 
-	ltsServer := http.Server{
-		Handler: mux,
-		Addr:    fmt.Sprintf("%s:%d", o.Host, o.PortLTS),
+	if serverOptions.EnableLTS {
+		ltsServer := http.Server{
+			Handler: mux,
+			Addr:    fmt.Sprintf("%s:%d", o.Host, o.PortLTS),
+		}
+		err = ltsServer.ListenAndServeTLS(o.CertFile, o.KeyFile)
 	}
+
 	server := http.Server{
 		Handler: mux,
 		Addr:    fmt.Sprintf("%s:%d", o.Host, o.Port),
@@ -148,7 +155,6 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 		err := server.ListenAndServe()
 		helper.CheckErr(cmd, err)
 	}()
-	err = ltsServer.ListenAndServeTLS(o.CertFile, o.KeyFile)
 	return
 }
 
