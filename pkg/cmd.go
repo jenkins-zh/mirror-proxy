@@ -61,7 +61,7 @@ func init() {
 		"The host of the server")
 	rootCmd.Flags().IntVarP(&serverOptions.Port, "port", "", 7070,
 		"The port of the server")
-	rootCmd.Flags().IntVarP(&serverOptions.Port, "port-lts", "", 7071,
+	rootCmd.Flags().IntVarP(&serverOptions.PortLTS, "port-lts", "", 7071,
 		"The LTS port of the server")
 	rootCmd.Flags().BoolVarP(&serverOptions.EnableLTS, "enable-lts", "", false,
 		"If enable the lts")

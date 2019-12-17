@@ -9,6 +9,7 @@ bin
 # Test binary, build with `go test -c`
 *.test
 pkg/cache.yaml
+cache.yaml
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
