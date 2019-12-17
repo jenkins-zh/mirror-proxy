@@ -10,5 +10,5 @@ RUN chmod u+x mirror-proxy
 
 COPY config/.mirror-proxy.yaml /root/.mirror-proxy.yaml
 
-ENTRYPOINT ["./mirror-proxy"]
-CMD []
+#ENTRYPOINT ["./mirror-proxy"]
+CMD ["./mirror-proxy"]
