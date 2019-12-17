@@ -34,7 +34,9 @@ jobs:
 
           docker login docker.pkg.github.com --username LinuxSuRen --password ${DOCKER_TOKEN}
           docker build . -t docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG
+          docker tag docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy
           docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG
+          docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy
 #      - name: git-tag
 #        uses: jenkins-zh/git-tag-actions@master
 #        env:
