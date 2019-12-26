@@ -18,7 +18,7 @@ linux:
 build-all: darwin linux
 
 run:
-	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
+	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key --config config/.mirror-proxy.yaml
 
 run-linux:
 	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
