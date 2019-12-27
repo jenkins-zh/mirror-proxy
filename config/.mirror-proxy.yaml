@@ -3,3 +3,5 @@ providers:
 jsonServers:
   Gitee: https://jenkins-zh.gitee.io/update-center-mirror
   GitHub: https://jenkins-zh.github.io/update-center-mirror
+  Gitlab: https://gitlab.com/jenkins-zh/update-center-mirror/raw/master
+defaultJSONServer: gitlab
