@@ -1,3 +1,5 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/jenkinszh/mirror-proxy.svg)](https://hub.docker.com/r/jenkinszh/mirror-proxy/tags)
+
 ## Jenkins Update Center Mirror Proxy
 
 The proxy is a HTTP server which serve for several different Jenkins Update Center sites.
