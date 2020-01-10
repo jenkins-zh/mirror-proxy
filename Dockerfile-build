@@ -1,25 +1,19 @@
 FROM golang:latest as builder
+WORKDIR /go/src/github.com/jenkins-zh/mirror-proxy
 
-LABEL maintainer="Rick <rick@jenkins-zh.cn>"
-
-WORKDIR /app
-
-COPY go.mod go.sum ./
-RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+RUN make linux
 
 FROM alpine:3.3
+LABEL maintainer="Rick <rick@jenkins-zh.cn>"
+LABEL Description="This is the Jenkins update center mirror proxy"
 
 USER root
-
 RUN sed -i 's|dl-cdn.alpinelinux.org|mirrors.aliyun.com|g' /etc/apk/repositories
 RUN apk add --no-cache ca-certificates curl
 
-COPY --from=builder bin/linux/mirror-proxy .
-RUN chmod u+x mirror-proxy
+COPY --from=builder /go/src/github.com/jenkins-zh/mirror-proxy/bin/linux/mirror-proxy .
 
-COPY config/.mirror-proxy.yaml /root/.mirror-proxy.yaml
+EXPOSE 7070
 
 ENTRYPOINT ["./mirror-proxy"]
-CMD []

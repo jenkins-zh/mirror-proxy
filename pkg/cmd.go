@@ -57,7 +57,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&serverOptions.DefaultJSONServer, "default-json-server", "", "https://gitlab.com/jenkins-zh/update-center-mirror/raw/master",
 		"The default JSON server of the update center mirror")
 
-	rootCmd.Flags().StringVarP(&serverOptions.Host, "host", "", "127.0.0.1",
+	rootCmd.Flags().StringVarP(&serverOptions.Host, "host", "", "0.0.0.0",
 		"The host of the server")
 	rootCmd.Flags().IntVarP(&serverOptions.Port, "port", "", 7070,
 		"The port of the server")
@@ -152,6 +152,8 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 		Handler: mux,
 		Addr:    fmt.Sprintf("%s:%d", o.Host, o.Port),
 	}
+
+	fmt.Printf("prepare to start server %s:%d\n", o.Host, o.Port)
 
 	err = server.ListenAndServe()
 	return
