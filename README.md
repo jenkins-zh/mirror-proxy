@@ -20,12 +20,18 @@ On Linux, please follow this:
 
 `make linux cert run-linux`
 
-Run it as a Docker container:
-
-`docker run -v rootCA:/rootCA docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:0.0.1 --cert /rootCA/demo.crt --key /rootCA/demo.key`
-
 Copy the binary file from docker image:
 `mirror_proxy_id=$(docker create docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:v0.0.3) && sudo docker cp $mirror_proxy_id:/mirror-proxy . && docker rm -v $mirror_proxy_id`
+
+## Run in Docker
+
+Run the Jenkins Update Center mirror proxy in docker:
+
+`make run-image`
+
+Given the certificate file:
+
+`docker run -v rootCA:/rootCA docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:0.0.1 --cert /rootCA/demo.crt --key /rootCA/demo.key`
 
 ## API
 

@@ -19,15 +19,18 @@ type ServerOptions struct {
 	DefaultProvider   string
 	DefaultJSONServer string
 
-	Host    string
-	Port    int
-	PortLTS int
+	Host      string
+	Port      int
+	PortLTS   int
 	EnableLTS bool
 
 	CertFile string
 	KeyFile  string
 
-	Printer helper.Printer
+	DataFilePath string
+	Printer      helper.Printer
+
+	WorkPool *WorkPool
 }
 
 var serverOptions ServerOptions
@@ -66,6 +69,8 @@ func init() {
 	rootCmd.Flags().BoolVarP(&serverOptions.EnableLTS, "enable-lts", "", false,
 		"If enable the lts")
 
+	rootCmd.Flags().StringVarP(&serverOptions.DataFilePath, "data-file-path", "", "data",
+		"The data file path")
 	rootCmd.Flags().StringVarP(&serverOptions.CertFile, "cert", "", "",
 		"The cert file of the server")
 	rootCmd.Flags().StringVarP(&serverOptions.KeyFile, "key", "", "",
@@ -75,6 +80,9 @@ func init() {
 	viper.BindPFlag("default-json-server", rootCmd.PersistentFlags().Lookup("default-json-server"))
 	viper.BindPFlag("cert", rootCmd.PersistentFlags().Lookup("cert"))
 	viper.BindPFlag("key", rootCmd.PersistentFlags().Lookup("key"))
+
+	serverOptions.WorkPool = &WorkPool{}
+	serverOptions.WorkPool.InitPool(5)
 }
 
 func initConfig(printer helper.Printer) {

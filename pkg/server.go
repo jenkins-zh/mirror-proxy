@@ -45,8 +45,19 @@ func HandleUpdateCenter(w http.ResponseWriter, r *http.Request) {
 	o := r.Context().Value(context.TODO()).(ServerOptions)
 	query := GetUpdateCenterQuery(r.URL.Query(), r.Header)
 
-	var targetURL *url.URL
+	o.WorkPool.AddTask(Task{
+		TaskFunc: func(_ interface{}) {
+			pluginDownloadCounter := &GitPluginDownloadCounter{
+				Path: o.DataFilePath,
+			}
+			if err := pluginDownloadCounter.RecordUpdateCenterVisitData(); err != nil {
+				fmt.Println(err)
+			}
+		},
+	})
+
 	var err error
+	var targetURL *url.URL
 	if targetURL, err = o.GetAndCacheURL(query); err == nil {
 		w.Header().Set("Location", o.GetProviderURL(targetURL, query))
 		w.WriteHeader(http.StatusMovedPermanently)
