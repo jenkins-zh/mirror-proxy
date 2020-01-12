@@ -16,3 +16,9 @@ cache.yaml
 
 # idea
 .idea
+
+# code
+.DS_Store
+
+# application
+data

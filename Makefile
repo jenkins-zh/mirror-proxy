@@ -20,6 +20,9 @@ build-all: darwin linux
 run:
 	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key --config config/.mirror-proxy.yaml
 
+run-no-dev: darwin
+	./bin/darwin/$(NAME) --config config/.mirror-proxy.yaml
+
 run-linux:
 	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
 
@@ -44,3 +47,9 @@ tools:
 test: tools before-test
 	go vet ./...
 	go test ./... -v -coverprofile coverage.out
+
+image: linux
+	docker build -t jenkins-zh/mirror-proxy:dev .
+
+run-image: image
+	docker run -p 7070:7070 --rm jenkins-zh/mirror-proxy:dev

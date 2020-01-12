@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // AddContext add context inject all handlers
@@ -45,8 +46,19 @@ func HandleUpdateCenter(w http.ResponseWriter, r *http.Request) {
 	o := r.Context().Value(context.TODO()).(ServerOptions)
 	query := GetUpdateCenterQuery(r.URL.Query(), r.Header)
 
-	var targetURL *url.URL
+	o.WorkPool.AddTask(Task{
+		TaskFunc: func(_ interface{}) {
+			pluginDownloadCounter := &GitPluginDownloadCounter{
+				Path: o.DataFilePath,
+			}
+			if err := pluginDownloadCounter.RecordUpdateCenterVisitData(); err != nil {
+				fmt.Println(err)
+			}
+		},
+	})
+
 	var err error
+	var targetURL *url.URL
 	if targetURL, err = o.GetAndCacheURL(query); err == nil {
 		w.Header().Set("Location", o.GetProviderURL(targetURL, query))
 		w.WriteHeader(http.StatusMovedPermanently)
@@ -118,4 +130,40 @@ func HandleDefaultProvider(w http.ResponseWriter, r *http.Request) {
 	o := r.Context().Value(context.TODO()).(ServerOptions)
 	_, writeErr = io.WriteString(w, o.DefaultProvider)
 	helper.CheckErr(o.Printer, writeErr)
+}
+
+// HandlePluginDownload as a proxy of plugin download
+func HandlePluginDownload(w http.ResponseWriter, r *http.Request) {
+	queryValues := r.URL.Query()
+
+	var providerHost string
+	provider := queryValues.Get("provider")
+	switch provider {
+	default:
+		provider = "tsinghua"
+		providerHost = "https://mirrors.tuna.tsinghua.edu.cn"
+	}
+
+	uri := r.RequestURI
+	uri = strings.Split(uri, "?")[0]
+
+	o := r.Context().Value(context.TODO()).(ServerOptions)
+	o.WorkPool.AddTask(Task{
+		TaskFunc: func(_ interface{}) {
+			pluginDownloadCounter := &GitPluginDownloadCounter{
+				Path: o.DataFilePath,
+			}
+
+			index := strings.LastIndex(uri, "/")
+			pluginName := uri[index+1:]
+			pluginName = strings.Split(pluginName, ".")[0]
+
+			if err := pluginDownloadCounter.RecordPluginDownloadData(pluginName, provider); err != nil {
+				fmt.Println(err)
+			}
+		},
+	})
+
+	w.Header().Set("Location", fmt.Sprintf("%s%s", providerHost, uri))
+	w.WriteHeader(http.StatusMovedPermanently)
 }
