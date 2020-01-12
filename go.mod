@@ -15,5 +15,7 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.3.2
 	go.uber.org/zap v1.12.0
+	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
+	golang.org/x/tools v0.0.0-20200110213125-a7a6caa82ab2 // indirect
 	gopkg.in/yaml.v2 v2.2.4
 )

@@ -2,11 +2,9 @@ package pkg_test
 
 import (
 	server "github.com/jenkins-zh/mirror-proxy/pkg"
-	"github.com/magiconair/properties/assert"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"os"
-	"testing"
 )
 
 var _ = Describe("GitPluginDownloadCounter", func() {
@@ -31,10 +29,9 @@ var _ = Describe("GitPluginDownloadCounter", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("FindByYear", func() {
-		data, err := counter.FindByYear(year)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(data).NotTo(BeNil())
+	It("FindByYear without data file", func() {
+		_, err := counter.FindByYear(year)
+		Expect(err).To(HaveOccurred())
 	})
 
 	It("Save", func() {
@@ -54,13 +51,3 @@ var _ = Describe("GitPluginDownloadCounter", func() {
 		Expect(resultData).NotTo(BeNil(), "cannot found the saved data")
 	})
 })
-
-func TestGetCurrentYear(t *testing.T) {
-	currentYear := server.GetCurrentYear()
-	assert.Equal(t, currentYear, "2020")
-}
-
-func TestGetDate(t *testing.T) {
-	currentYear := server.GetDate()
-	assert.Equal(t, currentYear, "2020-01-11")
-}

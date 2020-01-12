@@ -28,6 +28,8 @@ var _ = Describe("test server", func() {
 
 	BeforeEach(func() {
 		option = server.ServerOptions{}
+		option.WorkPool = &server.WorkPool{}
+		option.WorkPool.InitPool(5)
 	})
 
 	JustBeforeEach(func() {

@@ -133,7 +133,7 @@ func HandleDefaultProvider(w http.ResponseWriter, r *http.Request) {
 }
 
 // HandlePluginDownload as a proxy of plugin download
-func HandlePluginDownload(w http.ResponseWriter, r *http.Request)  {
+func HandlePluginDownload(w http.ResponseWriter, r *http.Request) {
 	queryValues := r.URL.Query()
 
 	var providerHost string
@@ -147,7 +147,6 @@ func HandlePluginDownload(w http.ResponseWriter, r *http.Request)  {
 	uri := r.RequestURI
 	uri = strings.Split(uri, "?")[0]
 
-
 	o := r.Context().Value(context.TODO()).(ServerOptions)
 	o.WorkPool.AddTask(Task{
 		TaskFunc: func(_ interface{}) {
@@ -156,7 +155,7 @@ func HandlePluginDownload(w http.ResponseWriter, r *http.Request)  {
 			}
 
 			index := strings.LastIndex(uri, "/")
-			pluginName := uri[index + 1:]
+			pluginName := uri[index+1:]
 			pluginName = strings.Split(pluginName, ".")[0]
 
 			if err := pluginDownloadCounter.RecordPluginDownloadData(pluginName, provider); err != nil {
