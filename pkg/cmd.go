@@ -150,11 +150,13 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 	mux.Handle("/jenkins/plugins/", AddContext(http.HandlerFunc(HandlePluginDownload), o))
 
 	if serverOptions.EnableLTS {
-		ltsServer := http.Server{
-			Handler: mux,
-			Addr:    fmt.Sprintf("%s:%d", o.Host, o.PortLTS),
-		}
-		err = ltsServer.ListenAndServeTLS(o.CertFile, o.KeyFile)
+		go func() {
+			ltsServer := http.Server{
+				Handler: mux,
+				Addr:    fmt.Sprintf("%s:%d", o.Host, o.PortLTS),
+			}
+			err = ltsServer.ListenAndServeTLS(o.CertFile, o.KeyFile)
+		}()
 	}
 
 	server := http.Server{
