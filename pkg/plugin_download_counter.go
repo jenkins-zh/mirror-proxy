@@ -64,19 +64,49 @@ func (g *GitPluginDownloadCounter) Save(downloadData *PluginDownloadData) (err e
 }
 
 func (g *GitPluginDownloadCounter) UpdateCenterCountIncrease(downloadData *PluginDownloadData) (err error) {
-	if center, ok := downloadData.Plugins["update-center"]; ok {
+	err = g.PluginCountIncrease(downloadData, "update-center")
+	return
+}
+
+func (g *GitPluginDownloadCounter) PluginCountIncrease(downloadData *PluginDownloadData, plugin string) (err error) {
+	if center, ok := downloadData.Plugins[plugin]; ok {
 		if count, ok := center.Data[GetDate()]; ok {
 			center.Data[GetDate()] = count + 1
 		} else {
 			center.Data[GetDate()] = 1
 		}
 	} else {
-		downloadData.Plugins = make(map[string]PluginData, 1)
-		downloadData.Plugins["update-center"] = PluginData{
+		if len(downloadData.Plugins) == 0 {
+			downloadData.Plugins = make(map[string]PluginData, 1)
+		}
+
+		downloadData.Plugins[plugin] = PluginData{
 			Data: map[string]int64{
 				GetDate(): 1,
 			},
 		}
+	}
+	return
+}
+
+func (g *GitPluginDownloadCounter) RecordPluginDownloadData(plugin, provider string) (err error) {
+	fmt.Println("plugin", plugin, "provider", provider)
+	var downloadData *PluginDownloadData
+	if downloadData, err = g.FindByYear(GetCurrentYear()); err != nil {
+		fmt.Println("cannot find by year", GetCurrentYear(), err)
+		downloadData = &PluginDownloadData{
+			Year: GetCurrentYear(),
+		}
+	}
+	fmt.Println(downloadData)
+
+	if err = g.PluginCountIncrease(downloadData, plugin); err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println("pluginDownloadCounter.Save", downloadData)
+	if err = g.Save(downloadData); err != nil {
+		fmt.Println(err)
 	}
 	return
 }
@@ -89,7 +119,6 @@ func (g *GitPluginDownloadCounter) RecordUpdateCenterVisitData() (err error) {
 			Year: GetCurrentYear(),
 		}
 	}
-	fmt.Println(downloadData)
 
 	if err = g.UpdateCenterCountIncrease(downloadData); err != nil {
 		fmt.Println(err)

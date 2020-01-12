@@ -147,6 +147,7 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 	mux.Handle("/json-servers", AddContext(http.HandlerFunc(HandleJSONServers), o))
 	mux.Handle("/providers", AddContext(http.HandlerFunc(HandleProviders), o))
 	mux.Handle("/providers/default", AddContext(http.HandlerFunc(HandleDefaultProvider), o))
+	mux.Handle("/jenkins/plugins/", AddContext(http.HandlerFunc(HandlePluginDownload), o))
 
 	if serverOptions.EnableLTS {
 		ltsServer := http.Server{
