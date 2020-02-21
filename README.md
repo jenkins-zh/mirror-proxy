@@ -39,10 +39,12 @@ The only API path is:
 
 |API|Description|
 |---|---|
-|`GET /update-center.json?version=2.190.2`|Get the update-center.json which allows you give different query conditions|
-|`GET /json-servers`|Get all JSON servers|
-|`GET /providers`|Get all mirror storage providers|
-|`GET /providers/default`|Get the default mirror storage provider|
+| `GET /update-center.json?version=2.190.2`|Get the update-center.json which allows you give different query conditions|
+| `GET /json-servers`|Get all JSON servers|
+| `GET /providers`|Get all mirror storage providers|
+| `GET /providers/default`|Get the default mirror storage provider|
+| `GET /plugins/list?year=2020` | Get the plugin list |
+| `GET /plugins?year=2020&name=TwilioNotifier` | Get the download data of a specific plugin |
 
 ### Update Center
 
