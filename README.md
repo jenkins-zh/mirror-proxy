@@ -14,11 +14,15 @@ The Mirror Proxy server has deployed to here.
 
 Run it as demo on MacOS, please follow this:
 
-`make darwin cert run`
+`make run`
 
 On Linux, please follow this:
 
-`make linux cert run-linux`
+`make run-linux`
+
+On windows, please follow this:
+
+`make run-win`
 
 Copy the binary file from docker image:
 `mirror_proxy_id=$(docker create docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:v0.0.3) && sudo docker cp $mirror_proxy_id:/mirror-proxy . && docker rm -v $mirror_proxy_id`
@@ -39,10 +43,12 @@ The only API path is:
 
 |API|Description|
 |---|---|
-|`GET /update-center.json?version=2.190.2`|Get the update-center.json which allows you give different query conditions|
-|`GET /json-servers`|Get all JSON servers|
-|`GET /providers`|Get all mirror storage providers|
-|`GET /providers/default`|Get the default mirror storage provider|
+| `GET /update-center.json?version=2.190.2`|Get the update-center.json which allows you give different query conditions|
+| `GET /json-servers`|Get all JSON servers|
+| `GET /providers`|Get all mirror storage providers|
+| `GET /providers/default`|Get the default mirror storage provider|
+| `GET /plugins/list?year=2020` | Get the plugin list |
+| `GET /plugins?year=2020&name=TwilioNotifier` | Get the download data of a specific plugin |
 
 ### Update Center
 

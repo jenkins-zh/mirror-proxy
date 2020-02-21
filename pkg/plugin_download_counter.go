@@ -22,6 +22,8 @@ type PluginDownloadCounter interface {
 	FindByYear(year string) (*PluginDownloadData, error)
 	Save(data *PluginDownloadData) error
 
+	FindPluginData(year, name string) (PluginData, error)
+
 	UpdateCenterCountIncrease(downloadData *PluginDownloadData) error
 }
 
@@ -59,6 +61,20 @@ func (g *GitPluginDownloadCounter) Save(downloadData *PluginDownloadData) (err e
 	var data []byte
 	if data, err = yaml.Marshal(downloadData); err == nil {
 		err = ioutil.WriteFile(dataFilePath, data, 0644)
+	}
+	return
+}
+
+// FindPluginData returns the plugin data by searching year and name
+func (g *GitPluginDownloadCounter) FindPluginData(year, name string) (data PluginData, err error) {
+	var downloadData *PluginDownloadData
+	if downloadData, err = g.FindByYear(year); err != nil {
+		return
+	}
+
+	var ok bool
+	if data, ok = downloadData.Plugins[name]; !ok {
+		err = fmt.Errorf("cannot found plugin: %s", name)
 	}
 	return
 }

@@ -15,16 +15,27 @@ linux:
 	GOPROXY=https://mirrors.aliyun.com/goproxy/ CGO_ENABLED=$(CGO_ENABLED) GOOS=linux GOARCH=amd64 $(GO) $(BUILD_TARGET) $(BUILDFLAGS) -o bin/linux/$(NAME) $(MAIN_SRC_FILE)
 	chmod +x bin/linux/$(NAME)
 
-build-all: darwin linux
+win:
+	go get github.com/inconshreveable/mousetrap
+	go get github.com/mattn/go-isatty
+	GOPROXY=https://mirrors.aliyun.com/goproxy/ CGO_ENABLED=$(CGO_ENABLED) GOOS=windows GOARCH=386 $(GO) $(BUILD_TARGET) $(BUILDFLAGS) -o bin/windows/$(NAME).exe $(MAIN_SRC_FILE)
 
-run:
+build-all: darwin linux win
+
+clean:
+	rm -rfv bin
+
+run: darwin cert
 	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key --config config/.mirror-proxy.yaml
 
 run-no-dev: darwin
 	./bin/darwin/$(NAME) --config config/.mirror-proxy.yaml
 
-run-linux:
+run-linux: linux cert
 	./bin/darwin/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
+
+run-win: win cert
+	./bin/windows/$(NAME) --cert bin/rootCA/demo.crt --key bin/rootCA/demo.key
 
 cert:
 	mkdir -p bin/rootCA

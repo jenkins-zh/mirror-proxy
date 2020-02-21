@@ -167,3 +167,85 @@ func HandlePluginDownload(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", fmt.Sprintf("%s%s", providerHost, uri))
 	w.WriteHeader(http.StatusMovedPermanently)
 }
+
+// HandlePluginsData returns the data of a plugin
+func HandlePluginsData(w http.ResponseWriter, r *http.Request) {
+	queryValues := r.URL.Query()
+
+	year := queryValues.Get("year")
+	name := queryValues.Get("name")
+
+	// use current year as the default
+	if year == "" {
+		year = GetCurrentYear()
+	}
+
+	// make sure we can return a data
+	if name == "" {
+		name = "update-center"
+	}
+
+	fmt.Println("plugin", name, "year", year)
+
+	// get plugin data
+	o := r.Context().Value(context.TODO()).(ServerOptions)
+	pluginDownloadCounter := &GitPluginDownloadCounter{
+		Path: o.DataFilePath,
+	}
+
+	pluginData, err := pluginDownloadCounter.FindPluginData(year, name)
+
+	responseData := ResponseData{
+		Data: pluginData,
+		Error: err,
+	}
+
+	var data []byte
+	if data, err = json.Marshal(responseData); err != nil {
+		fmt.Println(err)
+	}
+
+	w.Write(data)
+}
+
+func HandlePluginsDataList(w http.ResponseWriter, r *http.Request) {
+	queryValues := r.URL.Query()
+
+	year := queryValues.Get("year")
+
+	// use current year as the default
+	if year == "" {
+		year = GetCurrentYear()
+	}
+
+	// get plugin data
+	o := r.Context().Value(context.TODO()).(ServerOptions)
+	pluginDownloadCounter := &GitPluginDownloadCounter{
+		Path: o.DataFilePath,
+	}
+
+	responseData := ResponseData {}
+	if downloadData, err := pluginDownloadCounter.FindByYear(year); err == nil {
+		plugins := make([]string, 0)
+		for key, _ := range downloadData.Plugins {
+			plugins = append(plugins, key)
+		}
+
+		responseData.Data = plugins
+	} else {
+		responseData.Error = err
+	}
+
+	var data []byte
+	var err error
+	if data, err = json.Marshal(responseData); err != nil {
+		fmt.Println(err)
+	}
+
+	w.Write(data)
+}
+
+type ResponseData struct {
+	Data interface{}
+	Error error
+}
