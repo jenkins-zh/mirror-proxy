@@ -14,11 +14,15 @@ The Mirror Proxy server has deployed to here.
 
 Run it as demo on MacOS, please follow this:
 
-`make darwin cert run`
+`make run`
 
 On Linux, please follow this:
 
-`make linux cert run-linux`
+`make run-linux`
+
+On windows, please follow this:
+
+`make run-win`
 
 Copy the binary file from docker image:
 `mirror_proxy_id=$(docker create docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:v0.0.3) && sudo docker cp $mirror_proxy_id:/mirror-proxy . && docker rm -v $mirror_proxy_id`
