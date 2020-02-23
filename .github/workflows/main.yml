@@ -20,8 +20,6 @@ jobs:
       - name: Build
         run: make linux
       - name: Docker Publish
-        env:
-          DOCKER_TOKEN: ${{ secrets.DOCKER }}
         run: |
           VERSION=$(git tag --list | sort -V | tail -n 1)
           VERSION_BITS=(${VERSION//./ })
@@ -32,7 +30,7 @@ jobs:
 
           NEW_TAG="$VNUM1.$VNUM2.$VNUM3"
 
-          docker login docker.pkg.github.com --username LinuxSuRen --password ${DOCKER_TOKEN}
+          docker login docker.pkg.github.com --username LinuxSuRen --password ${{ secrets.GITHUB_TOKEN }}
           docker build . -t docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG
           docker tag docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy
           docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:$NEW_TAG
@@ -41,8 +39,8 @@ jobs:
 #        uses: jenkins-zh/git-tag-actions@master
 #        env:
 #          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
-#      - name: backup
-#        uses: jenkins-zh/git-backup-actions@v0.0.1
-#        env:
-#          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
-#          TARGET_GIT: "git@gitee.com:jenkins-zh/mirror-proxy.git"
+      - name: backup
+        uses: jenkins-zh/git-backup-actions@v0.0.3
+        env:
+          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
+          TARGET_GIT: "git@gitee.com:jenkins-zh/mirror-proxy.git"
