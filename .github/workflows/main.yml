@@ -30,8 +30,8 @@ jobs:
 #        uses: jenkins-zh/git-tag-actions@master
 #        env:
 #          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
-      - name: backup
-        uses: jenkins-zh/git-backup-actions@v0.0.3
-        env:
-          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
-          TARGET_GIT: "git@gitee.com:jenkins-zh/mirror-proxy.git"
+#      - name: backup
+#        uses: jenkins-zh/git-backup-actions@v0.0.3
+#        env:
+#          GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
+#          TARGET_GIT: "git@gitee.com:jenkins-zh/mirror-proxy.git"
