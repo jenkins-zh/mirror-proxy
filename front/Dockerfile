@@ -15,4 +15,5 @@ ENTRYPOINT ["/usr/bin/caddy"]
 CMD ["-conf", "/Caddyfile", "-root", "${SITE_ROOT}"]
 
 
-COPY index.html /public
+COPY index.html /public/index.html
+COPY Caddyfile /
