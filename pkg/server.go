@@ -205,6 +205,7 @@ func HandlePluginsData(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write(data)
 }
 
@@ -242,6 +243,7 @@ func HandlePluginsDataList(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write(data)
 }
 

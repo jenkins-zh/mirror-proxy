@@ -60,7 +60,28 @@ test: tools before-test
 	go test ./... -v -coverprofile coverage.out
 
 image: linux
-	docker build -t jenkins-zh/mirror-proxy:dev .
+	docker build -t jenkinszh/mirror-proxy:dev-$(COMMIT) .
+
+image-github: linux
+	docker build -t docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:dev-$(COMMIT) .
+
+push-image: image
+	docker push jenkinszh/mirror-proxy:dev-$(COMMIT)
+
+push-github-image: image-github
+	docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:dev-$(COMMIT)
 
 run-image: image
-	docker run -p 7070:7070 --rm jenkins-zh/mirror-proxy:dev
+	docker run -p 7070:7070 --rm jenkinszh/mirror-proxy:dev
+
+front-image:
+	docker build -t jenkinszh/mirror-proxy-front:dev-$(COMMIT) front
+
+front-github-image:
+	docker build -t docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy-front:dev-$(COMMIT) front
+
+front-image-push: front-image
+	docker push jenkinszh/mirror-proxy-front:dev-$(COMMIT)
+
+front-github-image-push: front-github-image
+	docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy-front:dev-$(COMMIT)

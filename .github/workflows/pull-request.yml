@@ -18,4 +18,13 @@ jobs:
           go-version: 1.13
         id: go
       - name: Build
-        run: make build-all test
+        run: make build-all
+      - name: Test
+        run: make test
+      - name: Build Image
+        run: |
+          docker login --username surenpi --password ${{ secrets.DOCKER_HUB_TOKEN }}
+          make push-image front-image-push
+
+          docker login docker.pkg.github.com --username LinuxSuRen --password ${{ secrets.GITHUB_TOKEN }}
+          make push-github-image front-github-image-push
