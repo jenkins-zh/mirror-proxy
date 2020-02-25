@@ -120,7 +120,6 @@ func (g *GitPluginDownloadCounter) RecordPluginDownloadData(plugin, provider str
 		fmt.Println(err)
 	}
 
-	fmt.Println("pluginDownloadCounter.Save", downloadData)
 	if err = g.Save(downloadData); err != nil {
 		fmt.Println(err)
 	}
@@ -140,7 +139,6 @@ func (g *GitPluginDownloadCounter) RecordUpdateCenterVisitData() (err error) {
 		fmt.Println(err)
 	}
 
-	fmt.Println("pluginDownloadCounter.Save", downloadData)
 	if err = g.Save(downloadData); err != nil {
 		fmt.Println(err)
 	}

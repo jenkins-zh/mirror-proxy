@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +21,8 @@ jobs:
       - name: Test
         run: make test
       - name: Build Image
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: |
-          docker login --username surenpi --password ${{ secrets.DOCKER_HUB_TOKEN }}
+          docker login --username surenpi --password DOCKER_TOKEN
           make push-image front-image-push
-
-          docker login docker.pkg.github.com --username LinuxSuRen --password ${{ secrets.GITHUB_TOKEN }}
-          make push-github-image front-github-image-push

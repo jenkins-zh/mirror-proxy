@@ -57,7 +57,7 @@ func init() {
 	rootCmd.Flags().StringVar(&serverOptions.Config, "config", "", "config file (default is $HOME/.mirror-proxy.yaml)")
 	rootCmd.Flags().StringVarP(&serverOptions.DefaultProvider, "default-provider", "", "tsinghua",
 		"The default provider of the update center mirror")
-	rootCmd.Flags().StringVarP(&serverOptions.DefaultJSONServer, "default-json-server", "", "https://gitlab.com/jenkins-zh/update-center-mirror/raw/master",
+	rootCmd.Flags().StringVarP(&serverOptions.DefaultJSONServer, "default-json-server", "", "https://cdn.jsdelivr.net/gh/jenkins-zh/update-center-mirror",
 		"The default JSON server of the update center mirror")
 
 	rootCmd.Flags().StringVarP(&serverOptions.Host, "host", "", "0.0.0.0",
