@@ -23,8 +23,7 @@ jobs:
         run: make test
       - name: Build Image
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: |
-          docker login --username surenpi --password $DOCKER_HUB_TOKEN
+          docker login --username surenpi --password DOCKER_TOKEN
           make push-image front-image-push
