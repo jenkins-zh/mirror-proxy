@@ -72,7 +72,7 @@ push-github-image: image-github
 	docker push docker.pkg.github.com/jenkins-zh/mirror-proxy/mirror-proxy:dev-$(COMMIT)
 
 run-image: image
-	docker run -p 7070:7070 --rm jenkinszh/mirror-proxy:dev
+	docker run -p 7070:7070 --rm jenkinszh/mirror-proxy:dev-$(COMMIT)
 
 front-image:
 	docker build -t jenkinszh/mirror-proxy-front:dev-$(COMMIT) front
