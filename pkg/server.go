@@ -41,6 +41,29 @@ func GetUpdateCenterQuery(querySources ...QuerySource) (query UpdateCenterQuery)
 	return
 }
 
+// HandleToolsUpdate handle GET /updates
+func HandleToolsUpdate(w http.ResponseWriter, r *http.Request) {
+	o := r.Context().Value(context.TODO()).(ServerOptions)
+	query := GetUpdateCenterQuery(r.URL.Query(), r.Header)
+	fmt.Println(r.RequestURI)
+
+	var err error
+	var targetURL *url.URL
+	if targetURL, err = o.GetAndCacheURL(query); err == nil {
+		providerURL := o.GetProviderURL(targetURL, query)
+
+		providerURL = strings.ReplaceAll(providerURL, "update-center.json", r.RequestURI)
+
+		w.Header().Set("Location", providerURL)
+		w.WriteHeader(http.StatusMovedPermanently)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+
+		_, err = w.Write([]byte(fmt.Sprintf("%v", err)))
+	}
+	helper.CheckErr(o.Printer, err)
+}
+
 // HandleUpdateCenter handle GET /update-center.json
 func HandleUpdateCenter(w http.ResponseWriter, r *http.Request) {
 	o := r.Context().Value(context.TODO()).(ServerOptions)

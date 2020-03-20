@@ -144,6 +144,7 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 	mux := http.NewServeMux()
 
 	mux.Handle("/update-center.json", AddContext(http.HandlerFunc(HandleUpdateCenter), o))
+	mux.Handle("/updates/", AddContext(http.HandlerFunc(HandleToolsUpdate), o))
 	mux.Handle("/json-servers", AddContext(http.HandlerFunc(HandleJSONServers), o))
 	mux.Handle("/providers", AddContext(http.HandlerFunc(HandleProviders), o))
 	mux.Handle("/providers/default", AddContext(http.HandlerFunc(HandleDefaultProvider), o))
