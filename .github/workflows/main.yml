@@ -19,13 +19,6 @@ jobs:
         id: go
       - name: Build
         run: make linux
-      - name: Docker Publish
-        run: |
-          docker login --username surenpi --password ${{ secrets.DOCKER_HUB_TOKEN }}
-          make push-image front-image-push
-
-          docker login docker.pkg.github.com --username LinuxSuRen --password ${{ secrets.GITHUB_TOKEN }}
-          make push-github-image front-github-image-push
 #      - name: git-tag
 #        uses: jenkins-zh/git-tag-actions@master
 #        env:
