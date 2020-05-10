@@ -49,6 +49,7 @@ The only API path is:
 | `GET /providers/default`|Get the default mirror storage provider|
 | `GET /plugins/list?year=2020` | Get the plugin list |
 | `GET /plugins?year=2020&name=TwilioNotifier` | Get the download data of a specific plugin |
+| `GET /status` | Get the server status |
 
 ### Update Center
 
