@@ -151,6 +151,7 @@ func (o *ServerOptions) Run(cmd *cobra.Command, args []string) (err error) {
 	mux.Handle("/jenkins/plugins/", AddContext(http.HandlerFunc(HandlePluginDownload), o))
 	mux.Handle("/plugins", AddContext(http.HandlerFunc(HandlePluginsData), o))
 	mux.Handle("/plugins/list", AddContext(http.HandlerFunc(HandlePluginsDataList), o))
+	mux.Handle("/status", AddContext(http.HandlerFunc(HandleHealthCheck), o))
 
 	if serverOptions.EnableLTS {
 		go func() {
