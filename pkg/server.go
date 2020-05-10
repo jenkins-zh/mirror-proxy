@@ -270,6 +270,11 @@ func HandlePluginsDataList(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+// HandleHealthCheck indicate server status
+func HandleHealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("ok"))
+}
+
 type ResponseData struct {
 	Data interface{}
 	Error error
