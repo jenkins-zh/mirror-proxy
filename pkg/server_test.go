@@ -130,6 +130,17 @@ var _ = Describe("test server", func() {
 			})
 		})
 	})
+
+	Context("HandleHealthCheck", func() {
+		BeforeEach(func() {
+			api = "/status"
+			reqHandler = server.HandleHealthCheck
+		})
+
+		It("should return ok", func() {
+			Expect(string(bodyData)).To(Equal("ok"))
+		})
+	})
 })
 
 var _ = Describe("GetUpdateCenterQuery", func() {
