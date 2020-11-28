@@ -8,7 +8,7 @@ require (
 	github.com/golang/mock v1.4.4
 	github.com/gosuri/uilive v0.0.3 // indirect
 	github.com/gosuri/uiprogress v0.0.1
-	github.com/magiconair/properties v1.8.1
+	github.com/magiconair/properties v1.8.4
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/onsi/ginkgo v1.14.2
