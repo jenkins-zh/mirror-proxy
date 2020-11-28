@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/coreos/go-etcd v2.0.0+incompatible // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-	github.com/golang/mock v1.3.1
+	github.com/golang/mock v1.4.4
 	github.com/gosuri/uilive v0.0.3 // indirect
 	github.com/gosuri/uiprogress v0.0.1
 	github.com/magiconair/properties v1.8.1
