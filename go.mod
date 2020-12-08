@@ -12,7 +12,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/onsi/ginkgo v1.14.2
-	github.com/onsi/gomega v1.10.1
+	github.com/onsi/gomega v1.10.4
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.7.1
 	github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 // indirect
